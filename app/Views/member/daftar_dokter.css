@@ -1,0 +1,21 @@
+*{
+    font-family: 'Poppins', sans-serif;
+}
+
+.navbar-brand {
+    letter-spacing: 2px;
+    font-weight: bold;
+}
+
+body {
+    background: white;
+    
+}
+
+.navigasi {
+    margin-bottom: 40px;
+}
+
+.container{
+    width: 90%;
+}
