@@ -23,7 +23,6 @@ class Register extends ResourceController
             'email' => 'required|valid_email|is_unique[auth.email]',
             'alamat' => 'required',
             'telp' => 'required',
-            'pass' => 'required|min_length[8]',
             'konf' => 'matches[pass]'
         ];
         if($this->validate($rules)) $this->fail($this->validator->getError());
@@ -36,8 +35,27 @@ class Register extends ResourceController
             'pass' => password_hash($this->request->getVar('pass'),PASSWORD_BCRYPT)
         ];
         $model = new UserModel();
-        $registered = $model->save($data);
-        $this->respondCreated($registered);
+        $cek = $model->where('username',$data['username'])->first();
+
+        if($model->where('username',$data['username'])->first()) {
+            $response = [
+                'status' => 0,
+                'msg' => "Username tidak tersedia"
+            ];
+        } elseif ($model->where('email',$data['email'])->first()) {
+            $response = [
+                'status' => 0,
+                'msg' => "Email telah digunakan"
+            ];
+        } else {
+            $model->save($data);
+            $response = [
+                'status' => 1,
+                'msg' => "Registrasi berhasil"
+            ];
+        }
+
+        return $this->respond($response);
     }
 
     /**

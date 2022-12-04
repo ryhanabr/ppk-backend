@@ -1,75 +1,135 @@
 <?php
- 
+
 namespace App\Controllers;
- 
+
+use App\Models\KecantikanModel;
 use CodeIgniter\RESTful\ResourceController;
-use CodeIgniter\API\ResponseTrait;
-use App\Models\PasienKecantikan;
- 
+
 class Kecantikan extends ResourceController
 {
-    use ResponseTrait;
-    // all users
+    /**
+     * Return an array of resource objects, themselves in array format
+     *
+     * @return mixed
+     */
     public function index()
     {
-        $model = new PasienKecantikan();
-        $data['perawatan_kecantikan_pasien'] = $model->orderBy('id', 'ASC')->findAll();
+        $model = new KecantikanModel();
+        $data = $model->findAll();
+        
         return $this->respond($data);
     }
-    // create
-    public function create()
+
+    /**
+     * Return the properties of a resource object
+     *
+     * @return mixed
+     */
+    public function show($username = null)
     {
-        $model = new PasienKecantikan();
+        $model = new KecantikanModel();
+        $status = $this->request->getVar('status');
+        $nama = ($this->request->getVar('nama')) ? $this->request->getVar('nama') : "" ;
+
+        if($status) {
+            $data = $model->where('username',$username)->where('status',$status)->like('nama_pasien',$nama)->findAll();
+        } else {
+            $data = $model->where('username',$username)->like('nama_pasien',$nama)->findAll();
+        }
+
+        return $this->respond($data);
+    }
+
+    public function view($id = null)
+    {
+        $model = new KecantikanModel();
+        $data = $model->where('id',$id)->first();
+
+        return $this->respond($data);
+    }
+
+    /**
+     * Return a new resource object, with default properties
+     *
+     * @return mixed
+     */
+    public function new()
+    {
+        //
+    }
+
+    /**
+     * Create a new resource object, from "posted" parameters
+     *
+     * @return mixed
+     */
+    public function create($username = null)
+    {
+        $model = new KecantikanModel();
         $data = [
-            'nama_pasien' => $this->request->getVar('nama_pasien'),
-            'jk'  => $this->request->getVar('jk'),
-            'umur'  => $this->request->getVar('umur'),
-            'tanggal'  => $this->request->getVar('tanggal'),
-            'catatan'  => $this->request->getVar('catatan'),
-            'username'  => $this->request->getVar('username')
+            "nama_pasien" => $this->request->getVar('nama_pasien'),
+            "jk" => $this->request->getVar('jk'),
+            "umur" => $this->request->getVar('umur'),
+            "tanggal" => $this->request->getVar('tanggal'),
+            "catatan" => $this->request->getVar('catatan'),
+            "username" => $username,
+            "status" => "Menunggu"
         ];
+
+        $cek = $model->where('nama_pasien',$data['nama_pasien'])->where('tanggal',$data['tanggal'])->first();
+        if($cek) {
+            $response = [
+                'status' => "Gagal",
+                'msg' => "Satu nama tidak boleh mendaftar dua kali pada hari yang sama",
+            ];
+            return $this->respond($response);
+        } else if($data['tanggal'] < date('Y/m/d')) {
+            $response = [
+                'status' => "Gagal",
+                'msg' => "Tanggal tidak boleh kurang dari hari ini",
+            ];
+
+            return $this->respond($response);
+        }
+
         $model->insert($data);
         $response = [
-            'status'   => 201,
-            'error'    => null,
-            'messages' => [
-                'success' => 'Data produk berhasil ditambahkan.'
-            ]
+            'status' => "OK",
+            'msg' => "Antrian berhasil dibuat"
         ];
-        return $this->respondCreated($response);
+
+        return $this->respond($response);
     }
-    // single user
-    public function show($id = null)
+
+    /**
+     * Return the editable properties of a resource object
+     *
+     * @return mixed
+     */
+    public function edit($id = null)
     {
-        $model = new PasienKecantikan();
-        $data = $model->where('id', $id)->first();
-        if ($data) {
-            return $this->respond($data);
-        } else {
-            return $this->failNotFound('Data tidak ditemukan.');
-        }
+        //
     }
-    // update
+
+    /**
+     * Add or update a model resource, from "posted" properties
+     *
+     * @return mixed
+     */
     public function update($id = null)
     {
-        $model = new PasienKecantikan();
+        $model = new KecantikanModel();
         $json = $this->request->getJSON();
         if ($json) {
             $data = [
-                'nama_pasien' => $json->nama_pasien,
-                'jk'  => $json->jk,
-                'umur'  => $json->umur,
                 'tanggal'  => $json->tanggal,
-                'catatan'  => $json->catatan
+                'catatan' => $json->catatan
             ];
         } else {
             $input = $this->request->getRawInput();
             $data = [
-                'nama_pasien' => $input['nama_pasien'],
-                'jk'  => $input['jk'],
-                'umur'  => $input['umur'],
                 'tanggal'  => $input['tanggal'],
-                'catatan'  => $input['catatan']
+                'catatan' => $input['catatan']
             ];
         }
         // Insert to Database
@@ -77,25 +137,27 @@ class Kecantikan extends ResourceController
         $response = [
             'status'   => 200,
             'error'    => null,
-            'messages' => [
-                'success' => 'Data produk berhasil diubah.'
-            ]
+            'messages' => "Data berhasil diubah!"
         ];
         return $this->respond($response);
     }
-    // delete
+
+    /**
+     * Delete the designated resource object from the model
+     *
+     * @return mixed
+     */
     public function delete($id = null)
     {
-        $model = new PasienKecantikan();
-        $data = $model->where('id', $id)->delete($id);
+        $model = new KecantikanModel();
+        $data = $model->where('id', $id)->first();
         if ($data) {
             $model->delete($id);
             $response = [
                 'status'   => 200,
                 'error'    => null,
-                'messages' => [
-                    'success' => 'Data produk berhasil dihapus.'
-                ]
+                'data Id' => $data['id'],
+                'messages' => 'Data berhasil dihapus'
             ];
             return $this->respondDeleted($response);
         } else {

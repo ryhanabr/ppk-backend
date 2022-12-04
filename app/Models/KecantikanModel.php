@@ -4,17 +4,17 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class DokterModel extends Model
+class KecantikanModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'dokter';
+    protected $table            = 'perawatan_kecantikan_pasien';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['id','nama_lengkap','jk','kategori','jadwal'];
+    protected $allowedFields    = ['id','nama_pasien','jk','umur','tanggal','catatan','username','status'];
 
     // Dates
     protected $useTimestamps = false;

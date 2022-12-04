@@ -19,8 +19,7 @@ class Login extends ResourceController
     {
         helper(['form']);
         $rules = [
-            'username' => 'required',
-            'pass' => 'required|min_length[8]',
+            'username' => 'required'
         ];
         if($this->validate($rules)) $this->fail($this->validator->getErrors());
         $model = new UserModel();
@@ -38,8 +37,12 @@ class Login extends ResourceController
             "username" => $user['username']
         );
 
+        
+
         $token = JWT::encode($payload, $key, 'HS256');
-        return $this->respond($token);
+        $user['token'] = $token;
+        unset($user['pass']);
+        return $this->respond($user);
     }
 
     /**

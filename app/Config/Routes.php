@@ -39,11 +39,31 @@ $routes->get('/', 'Home::index', ['filter' => 'auth']);
 $routes->post('register', 'Register::index');
 $routes->post('login', 'Login::index');
 $routes->get('me', 'Me::index');
-$routes->resource('kesehatan');
-$routes->resource('kecantikan');
+$routes->get('beranda', 'Beranda::index');
+
+$routes->get('kesehatan', 'Kesehatan::index');
+$routes->get('kesehatan/(.*)', 'Kesehatan::show/$1');
+$routes->get('view_kesehatan/(.*)','Kesehatan::view/$1');
+$routes->post('kesehatan','Kesehatan::create');
+$routes->put('kesehatan/(.*)','Kesehatan::update/$1');
+$routes->delete('kesehatan/(.*)','Kesehatan::delete/$1');
+
+$routes->get('kecantikan', 'Kecantikan::index');
+$routes->get('kecantikan/(.*)', 'Kecantikan::show/$1');
+$routes->get('view_kecantikan/(.*)','Kecantikan::view/$1');
+$routes->post('kecantikan','Kecantikan::create');
+$routes->put('kecantikan/(.*)','Kecantikan::update/$1');
+$routes->delete('kecantikan/(.*)','Kecantikan::delete/$1');
+
 $routes->resource('dokter');
 $routes->resource('auth');
-$routes->get('beranda', 'Beranda::index');
+
+
+
+$routes->get('member','Kesehatan::new');
+
+
+
 
 
 /*

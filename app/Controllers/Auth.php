@@ -5,21 +5,22 @@ namespace App\Controllers;
 use CodeIgniter\RESTful\ResourceController;
 use CodeIgniter\API\ResponseTrait;
 use App\Models\AuthModel;
- 
+use App\Models\UserModel;
+
 class Auth extends ResourceController
 {
     use ResponseTrait;
     // all users
     public function index()
     {
-        $model = new AuthModel();
+        $model = new UserModel();
         $data['auth'] = $model->orderBy('userId', 'ASC')->findAll();
         return $this->respond($data);
     }
     // create
     public function create()
     {
-        $model = new AuthModel();
+        $model = new UserModel();
         $data = [
             'nama_lengkap' => $this->request->getVar('nama_lengkap'),
             'username'  => $this->request->getVar('username'),
@@ -41,7 +42,7 @@ class Auth extends ResourceController
     // single user
     public function show($userId = null)
     {
-        $model = new AuthModel();
+        $model = new UserModel();
         $data = $model->where('userId', $userId)->first();
         if ($data) {
             return $this->respond($data);
@@ -52,7 +53,7 @@ class Auth extends ResourceController
     // update
     public function update($userId = null)
     {
-        $model = new AuthModel();
+        $model = new UserModel();
         $json = $this->request->getJSON();
         if ($json) {
             $data = [
@@ -84,7 +85,7 @@ class Auth extends ResourceController
     // delete
     public function delete($userId = null)
     {
-        $model = new AuthModel();
+        $model = new UserModel();
         $data = $model->where('userId', $userId)->delete($userId);
         if ($data) {
             $model->delete($userId);
