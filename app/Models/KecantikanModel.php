@@ -7,14 +7,14 @@ use CodeIgniter\Model;
 class KecantikanModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'kecantikans';
+    protected $table            = 'perawatan_kecantikan_pasien';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['id','nama_pasien','jk','umur','tanggal','catatan','username','status'];
 
     // Dates
     protected $useTimestamps = false;

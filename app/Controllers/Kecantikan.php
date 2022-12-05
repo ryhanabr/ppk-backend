@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\KecantikanModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class Kecantikan extends ResourceController
@@ -13,7 +14,10 @@ class Kecantikan extends ResourceController
      */
     public function index()
     {
-        //
+        $model = new KecantikanModel();
+        $data = $model->findAll();
+        
+        return $this->respond($data);
     }
 
     /**
@@ -21,9 +25,27 @@ class Kecantikan extends ResourceController
      *
      * @return mixed
      */
-    public function show($id = null)
+    public function show($username = null)
     {
-        //
+        $model = new KecantikanModel();
+        $status = $this->request->getVar('status');
+        $nama = ($this->request->getVar('nama')) ? $this->request->getVar('nama') : "" ;
+
+        if($status) {
+            $data = $model->where('username',$username)->where('status',$status)->like('nama_pasien',$nama)->findAll();
+        } else {
+            $data = $model->where('username',$username)->like('nama_pasien',$nama)->findAll();
+        }
+
+        return $this->respond($data);
+    }
+
+    public function view($id = null)
+    {
+        $model = new KecantikanModel();
+        $data = $model->where('id',$id)->first();
+
+        return $this->respond($data);
     }
 
     /**
@@ -41,9 +63,42 @@ class Kecantikan extends ResourceController
      *
      * @return mixed
      */
-    public function create()
+    public function create($username = null)
     {
-        //
+        $model = new KecantikanModel();
+        $data = [
+            "nama_pasien" => $this->request->getVar('nama_pasien'),
+            "jk" => $this->request->getVar('jk'),
+            "umur" => $this->request->getVar('umur'),
+            "tanggal" => $this->request->getVar('tanggal'),
+            "catatan" => $this->request->getVar('catatan'),
+            "username" => $username,
+            "status" => "Menunggu"
+        ];
+
+        $cek = $model->where('nama_pasien',$data['nama_pasien'])->where('tanggal',$data['tanggal'])->first();
+        if($cek) {
+            $response = [
+                'status' => "Gagal",
+                'msg' => "Satu nama tidak boleh mendaftar dua kali pada hari yang sama",
+            ];
+            return $this->respond($response);
+        } else if($data['tanggal'] < date('Y/m/d')) {
+            $response = [
+                'status' => "Gagal",
+                'msg' => "Tanggal tidak boleh kurang dari hari ini",
+            ];
+
+            return $this->respond($response);
+        }
+
+        $model->insert($data);
+        $response = [
+            'status' => "OK",
+            'msg' => "Antrian berhasil dibuat"
+        ];
+
+        return $this->respond($response);
     }
 
     /**
@@ -63,7 +118,28 @@ class Kecantikan extends ResourceController
      */
     public function update($id = null)
     {
-        //
+        $model = new KecantikanModel();
+        $json = $this->request->getJSON();
+        if ($json) {
+            $data = [
+                'tanggal'  => $json->tanggal,
+                'catatan' => $json->catatan
+            ];
+        } else {
+            $input = $this->request->getRawInput();
+            $data = [
+                'tanggal'  => $input['tanggal'],
+                'catatan' => $input['catatan']
+            ];
+        }
+        // Insert to Database
+        $model->update($id, $data);
+        $response = [
+            'status'   => 200,
+            'error'    => null,
+            'messages' => "Data berhasil diubah!"
+        ];
+        return $this->respond($response);
     }
 
     /**
@@ -73,6 +149,19 @@ class Kecantikan extends ResourceController
      */
     public function delete($id = null)
     {
-        //
+        $model = new KecantikanModel();
+        $data = $model->where('id', $id)->first();
+        if ($data) {
+            $model->delete($id);
+            $response = [
+                'status'   => 200,
+                'error'    => null,
+                'data Id' => $data['id'],
+                'messages' => 'Data berhasil dihapus'
+            ];
+            return $this->respondDeleted($response);
+        } else {
+            return $this->failNotFound('Data tidak ditemukan.');
+        }
     }
 }

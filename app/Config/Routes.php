@@ -37,6 +37,19 @@ $routes->set404Override();
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 
+$routes->post('register', 'Register::index');
+$routes->post('login', 'Login::index');
+$routes->get('me', 'Me::index');
+$routes->get('beranda', 'Beranda::index');
+
+$routes->get('view_kesehatan/(.*)','Kesehatan::view/$1');
+$routes->get('view_kecantikan/(.*)','Kecantikan::view/$1');
+
+$routes->resource('kecantikan');
+$routes->resource('kesehatan');
+$routes->resource('dokter');
+$routes->resource('user');
+
 /*
  * --------------------------------------------------------------------
  * Additional Routing

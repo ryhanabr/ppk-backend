@@ -7,14 +7,14 @@ use CodeIgniter\Model;
 class UserModel extends Model
 {
     protected $DBGroup          = 'default';
-    protected $table            = 'users';
-    protected $primaryKey       = 'id';
+    protected $table            = 'auth';
+    protected $primaryKey       = 'userId';
     protected $useAutoIncrement = true;
     protected $insertID         = 0;
     protected $returnType       = 'array';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = [];
+    protected $allowedFields    = ['nama_lengkap', 'username', 'email', 'alamat', 'telp', 'pass', 'admin'];
 
     // Dates
     protected $useTimestamps = false;
